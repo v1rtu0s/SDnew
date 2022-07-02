@@ -12,7 +12,8 @@
 	var targetnumber = 50;
 	var test = "xyz";
 	var targetmultiplier = "2";
-	
+	var win_state = false;
+	var xxx = document.getElementById("ergebnis_floatp");
 	
 	$: targetmultiplier = (100/(100-targetnumber)).toFixed(2);
 	$: resultarray = resultarray;
@@ -41,14 +42,47 @@
 	ergebnis_single = ergebnis_float;
 	console.log(ergebnis_single);
 	
+if (ergebnis_single >= targetnumber) {
+
+    
+	win_state = true;
+	color_change_win();
+
+
+}
+
+else {
+	
+	win_state = false;
+	color_change_lose();
+}
+	
+	
+	return {ergebnis_float, ergebnis_single, resultarray, win_state}}
+	
+	
+//$: ergebnis_single, color_change(); 
+
+function color_change_win() {
 
 	
-	return {ergebnis_float, ergebnis_single, resultarray}
 	
-	
-	}
-	
-	
+	//xxx.style.color = "#ffffff";
+	console.log("win!") 
+}
+
+
+function color_change_lose() {
+
+
+	//xxx.style.fontSize = "77px";
+	console.log("fail!")
+
+
+}	
+
+
+
 	
 	
 	
@@ -61,18 +95,12 @@
 	 
 	 <article> 
 		<div>
-
-			<ul>
-				{#each resultarray as ergebnisse}
-					<li>{ergebnisse}</li>
-				{/each}
-			</ul>
-</div>
+	<span class="cell" class:selected="{win_state}">{$progress.toFixed(2)}
+		<!-- <p2 id="ergebnis_floatp" style:text-align="center">{$progress.toFixed(2)}</p2> -->
+	</span></div>
 	<div>
-		<p2 id="ergebnis_float" style:text-align="center">{$progress.toFixed(2)}</p2>
-	
 	  <label for="range">
-	  <input type="range" disabled min="0.00" max="100.00" value="{$progress}" id="range" name="range">
+	  <input type="range" step="0.05" disabled min="0.00" max="100.00" value="{$progress}" id="range" name="range">
 	</label>
 </div>
 	
@@ -109,7 +137,11 @@ text-align: center;
 #targetnumber {
 
 	margin-top: 24px;
+}
 
+#ergebnis_floatp {
+color: #ffffff;
+transition: color 0.5s;
 
 }
 	  p {
@@ -122,13 +154,32 @@ text-align: center;
 	  p2
 	  {
 		font-size: xx-large;
-		color:aliceblue;
+		color:#f0f8ff;
 
+	  }
 
+	  p3
+
+	  {
+color:aliceblue;
+transition: color 0.5s;
 
 	  }
 
 	  ul li{
   display: inline;
 }
+
+span.cell {
+
+text-align: center;
+color: #f0f8ff;
+font-size: 44px;
+font-weight: bolder;
+
+}
+span.cell.selected {
+	text-align: center;
+    color: #72fe00;
+    transition: color 0.5s; }
 	</style>
