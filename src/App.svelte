@@ -15,6 +15,7 @@
 	
 	
 	$: targetmultiplier = (100/(100-targetnumber)).toFixed(2);
+	$: resultarray = resultarray;
 	
 	const progress = tweened(0, {
 			duration: 300,
@@ -40,8 +41,9 @@
 	ergebnis_single = ergebnis_float;
 	console.log(ergebnis_single);
 	
+
 	
-	return {ergebnis_float, ergebnis_single}
+	return {ergebnis_float, ergebnis_single, resultarray}
 	
 	
 	}
@@ -58,10 +60,13 @@
 	<main class="container">
 	 
 	 <article> 
-
 		<div>
-			
 
+			<ul>
+				{#each resultarray as ergebnisse}
+					<li>{ergebnisse}</li>
+				{/each}
+			</ul>
 </div>
 	<div>
 		<p2 id="ergebnis_float" style:text-align="center">{$progress.toFixed(2)}</p2>
@@ -122,4 +127,8 @@ text-align: center;
 
 
 	  }
+
+	  ul li{
+  display: inline;
+}
 	</style>
