@@ -17,6 +17,7 @@
 	var targetmultiplier = "2";
 	var win_state = false;
 	var win_state_animation = false;
+	var win_state_animation_lose = false;
 	var balance = 100.00;
 	var betsize = 0;
 	var win_amount = 0;
@@ -67,6 +68,7 @@ if (ergebnis_single >= targetnumber) {
 
 else {
 	
+	win_state_animation_lose = true;
 	win_state = false;
 	color_change_lose();
 }
@@ -123,11 +125,25 @@ function color_change_lose() {
 	<main class="container">
 	 
 	 <article>
-		<header><span class="balance">$ {balance.toFixed(2)}</span>
-			{#if win_state_animation == true }<span class="balance_win" class:selected="{win_state}" transition:blur="{{duration:350, easing: cubicOut,amount: 5,delay:0}}"
+		<header>
+			
+			<div class="parent2">
+				<div class="div4">{#if win_state_animation_lose == true }<span class="balance_lose" transition:blur="{{duration:350, easing: cubicOut,amount: 5,delay:0}}"
+			on:introend="{() => {win_state_animation_lose = false}}">-{betsize.toFixed(2)}</span>{/if}</div>
+				<div class="div5"><span class="balance">$ {balance.toFixed(2)}</span></div>
+				<div class="div6">{#if win_state_animation == true }<span class="balance_win" transition:blur="{{duration:350, easing: cubicOut,amount: 5,delay:0}}"
 			on:introend="{() => {win_state_animation = false}}"
 				
-				>+{((betsize*targetmultiplier)-betsize).toFixed(2)}</span>{/if}
+				>+{((betsize*targetmultiplier)-betsize).toFixed(2)}</span>
+				{/if}
+</div>
+			
+			
+			
+			
+			
+			
+				
 		
 		
 		
@@ -253,9 +269,18 @@ font-weight: lighter ;
 }
 
 span.balance_win {
-font-size: 20px;
+	position: absolute;
+font-size: 22px;
 font-weight: lighter ;
 color:#33ff05;
+
+}
+
+span.balance_lose {
+	position: absolute;
+font-size: 22px;
+font-weight: lighter ;
+color:#ff2f05;
 
 }
 span.icon {
@@ -297,6 +322,14 @@ grid-row-gap: 5px;
 .div2 { grid-area: 2 / 1 / 3 / 2; }
 .div3 { grid-area: 2 / 2 / 3 / 3; }
 
-
-
+.parent2 {
+display: grid;
+grid-template-columns: (1fr, 0.25fr, 1fr);
+grid-template-rows: 0.5fr;
+grid-column-gap: 0px;
+grid-row-gap: 0px;
+}
+.div4 { grid-area: 1 / 1 / 2 / 2;text-align: right; }
+.div5 { grid-area: 1 / 2 / 2 / 3;text-align: center; }
+.div6 { grid-area: 1 / 3 / 2 / 4;text-align: left; }
 	</style>
