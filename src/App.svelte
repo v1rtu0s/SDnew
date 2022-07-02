@@ -2,6 +2,8 @@
 
 	import { tweened } from 'svelte/motion';
 		import { cubicOut } from 'svelte/easing';
+		import { fly } from 'svelte/transition';
+	import { quintOut } from 'svelte/easing';
 	
 	
 	var result = 0;
@@ -66,7 +68,8 @@ else {
 function color_change_win() {
 
 	
-	
+
+	//document.body.style.backgroundColor = "#72fe00";
 	//xxx.style.color = "#ffffff";
 	console.log("win!") 
 }
@@ -74,7 +77,7 @@ function color_change_win() {
 
 function color_change_lose() {
 
-
+	//document.body.style.backgroundColor = "#000000";
 	//xxx.style.fontSize = "77px";
 	console.log("fail!")
 
@@ -94,6 +97,9 @@ function color_change_lose() {
 	<main class="container">
 	 
 	 <article> 
+		<div> 
+		{#if win_state == true } <div class="cell" class:selected="{win_state}" in:fly="{{delay: 0, duration: 250, x: 0, y: -500, opacity: 1, easing: cubicOut}}">WIN!</div>
+		{:else} <div class="cell" class:selected="{win_state}" in:fly="{{delay: 0, duration: 300, x: 0, y: 250, opacity: 1, easing: cubicOut}}">LOSE!</div> {/if} </div>
 		<div>
 	<span class="cell" class:selected="{win_state}">{$progress.toFixed(2)}
 		<!-- <p2 id="ergebnis_floatp" style:text-align="center">{$progress.toFixed(2)}</p2> -->
@@ -127,6 +133,9 @@ function color_change_lose() {
 	
 	<style>
 	
+
+
+
 
 div{
 
@@ -169,11 +178,15 @@ transition: color 0.5s;
 	  ul li{
   display: inline;
 }
+div.cell{
+color:#f0f8ff;
 
+
+}
 span.cell {
 
 text-align: center;
-color: #f0f8ff;
+color: #ff4000;
 font-size: 44px;
 font-weight: bolder;
 
@@ -182,4 +195,16 @@ span.cell.selected {
 	text-align: center;
     color: #72fe00;
     transition: color 0.5s; }
+
+div.cell {
+
+	color: #ff4000;
+
+}
+
+div.cell.selected {
+
+	color: #72fe00;
+    transition: color 0.5s;
+}
 	</style>
