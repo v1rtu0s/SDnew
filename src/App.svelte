@@ -30,16 +30,18 @@
 	
 	function roll() {
 	nonce++;
-	result = Math.random()*100;
+	result = (Math.random()*100).toFixed(2);
 	
 	resultarray.push(result);
 	console.log(resultarray);
+	console.log(nonce);
+
+	ergebnis_float = resultarray[resultarray.length-1];
+	ergebnis_single = ergebnis_float;
+	console.log(ergebnis_single);
 	
-	ergebnis_single = resultarray.splice(-1);
-	ergebnis_float = ergebnis_single[0].toFixed(2);
 	
-	
-	return {ergebnis_float, resultarray}
+	return {ergebnis_float, ergebnis_single}
 	
 	
 	}
@@ -54,13 +56,11 @@
 	</script>
 	
 	<main class="container">
-	  <h1>SHITTY-DICE</h1>
+	 
 	 <article> 
 
 		<div>
-			{#each resultarray as element, i (element)}
-<div class="element">{element}</div>
-{/each}
+			
 
 </div>
 	<div>
@@ -86,7 +86,7 @@
 	</article>
 	<article>
 	
-	<button id="rollbutton" on:click="{roll}" on:click="{() => progress.set(ergebnis_single[0])}">ROLL</button>
+	<button id="rollbutton" on:click="{roll}" on:click="{() => progress.set(parseFloat(ergebnis_single))}">ROLL</button>
 	
 	</article>
 	  
