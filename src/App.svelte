@@ -33,13 +33,13 @@
 	result = Math.random()*100;
 	
 	resultarray.push(result);
-	
+	console.log(resultarray);
 	
 	ergebnis_single = resultarray.splice(-1);
 	ergebnis_float = ergebnis_single[0].toFixed(2);
 	
 	
-	return {ergebnis_float}
+	return {ergebnis_float, resultarray}
 	
 	
 	}
@@ -56,24 +56,33 @@
 	<main class="container">
 	  <h1>SHITTY-DICE</h1>
 	 <article> 
-	
-	
+
+		<div>
+			{#each resultarray as element, i (element)}
+<div class="element">{element}</div>
+{/each}
+
+</div>
+	<div>
+		<p2 id="ergebnis_float" style:text-align="center">{$progress.toFixed(2)}</p2>
 	
 	  <label for="range">
 	  <input type="range" disabled min="0.00" max="100.00" value="{$progress}" id="range" name="range">
 	</label>
+</div>
 	
 	
 	
-	<p id="ergebnis_float" style:text-align="center">{$progress.toFixed(2)}</p>
 	 
-	</article>
-	
-	<article>
+	<div id="targetnumber">
+<p>_________________________________</p>
+	<p>SETTINGS</p>
 	  <label for="range">
 		<input type="range" min="2.00" max="99.00" bind:value={targetnumber} id="rangepicker" name="rangepicker">
 	  </label>
 	  <p id="ergebnis_float" style:text-align="center" style:margin-right="4px">>{targetnumber} </p><p>{targetmultiplier}x {100-targetnumber}%</p>
+	
+	</div>
 	</article>
 	<article>
 	
@@ -85,6 +94,19 @@
 	
 	<style>
 	
+
+div{
+
+text-align: center;
+
+}	
+
+#targetnumber {
+
+	margin-top: 24px;
+
+
+}
 	  p {
 	
 	text-align: center;
@@ -92,4 +114,12 @@
 	
 	  }
 	
+	  p2
+	  {
+		font-size: xx-large;
+		color:aliceblue;
+
+
+
+	  }
 	</style>
