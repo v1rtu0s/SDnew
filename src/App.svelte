@@ -7,6 +7,8 @@
 	import  { blur } from 'svelte/transition';
 	import Chart from 'chart.js/auto';
 import { getRelativePosition } from 'chart.js/helpers';
+import Limbo from './Limbo.svelte';
+import Dice from './Dice.svelte';
 
 
 	
@@ -29,7 +31,9 @@ import { getRelativePosition } from 'chart.js/helpers';
 	var balance_array = [];
 	var nonce_array = [];
 	var bet_totalamount = 1;
+	export let menu = 1;
 	var chart = undefined;
+	var render_chart_value = false;
 	var xxx = document.getElementById("ergebnis_floatp");
 	var details_var = undefined;
 	
@@ -70,7 +74,7 @@ import { getRelativePosition } from 'chart.js/helpers';
 	
 	function roll() {
 		
-		  
+		if (render_chart_value == false) { render_chart_value = true; renderChart();}
 		
 	balance = balance-betsize;
 	balance_progress.set(balance);
@@ -100,7 +104,7 @@ balance_progress.set(balance);
 balance_array.push(balance);
 win_state = true;
 win_state_animation = true;
-color_change_win();
+
 addData();
 
 }
@@ -109,60 +113,10 @@ else {
 balance_array.push(balance);
 win_state_animation_lose = true;
 win_state = false;
-color_change_lose();
+
 addData();
 }}
 
-
-	//return {ergebnis_float, ergebnis_single, resultarray, win_state, bet_totalamount}
-
-
-	           
-	
-	
-	
-
-
-
-
-
-
-	
-	
-//$: ergebnis_single, color_change(); 
-
-function color_change_win() {
-
-	
-
-	//document.body.style.backgroundColor = "#72fe00";
-	//xxx.style.color = "#ffffff";
-	console.log("win!") 
-}
-
-// function blur_inandout(node, { duration }) {
-// 		return {
-// 			duration,
-// 			css: timer => {
-// 				return `
-//           blur: rotateZ(${timer * 360}deg);
-//           transform-origin: center center;
-// 					color: rgb(
-//             ${100 * timer},
-//             ${100 * timer},
-//             ${100 * timer}
-// 					);`
-// 			}
-// 		};
-// 	}
-function color_change_lose() {
-
-	//document.body.style.backgroundColor = "#000000";
-	//xxx.style.fontSize = "77px";
-	console.log("fail!")
-
-
-}	
 
 function renderChart() {
 var ctx = document.getElementById("myChart").getContext("2d");
@@ -180,6 +134,8 @@ var ctx = document.getElementById("myChart").getContext("2d");
         ]
       },
       options: {
+		responsive: true,
+		maintainAspectRatio: false,
 		animations: {
 x: {duration: 650},
 y: {duration: 0},
@@ -241,27 +197,129 @@ function addData() {
 
 
 	
-	
+
 	
 	
 	
 	</script>
 	
 	<main class="container">
-	 
-	 <article>
-		<header>
-			
-			<div class="parent2">
-				<div class="div4">{#if win_state_animation_lose == true }<span class="balance_lose" transition:blur="{{duration:350, easing: cubicOut,amount: 5,delay:0}}"
-			on:introend="{() => {win_state_animation_lose = false}}">-{betsize.toFixed(2)}</span>{/if}</div>
-				<div class="div5"><span class="balance">$ {balance.toFixed(2)}</span></div>
-				<div class="div6">{#if win_state_animation == true }<span class="balance_win" transition:blur="{{duration:350, easing: cubicOut,amount: 5,delay:0}}"
+
+
+		<ul id="menu">
+			<li><a href="/" on:click|preventDefault={() => (menu = 1)}>Dice</a></li> |
+			<li><a href="/" on:click|preventDefault={() => (menu = 2)}>Limbo</a></li>
+		</ul>
+	<div class="parent">
+		<div class="div1">
+<div class="parent3">
+	
+ <div class="div9"><div>{#if win_state_animation == true }<div class="balance_win" transition:blur="{{duration:350, easing: cubicOut,amount: 5,delay:0}}"
 			on:introend="{() => {win_state_animation = false}}"
 				
-				>+{((betsize*targetmultiplier)-betsize).toFixed(2)}</span>
-				{/if}
+				>+{((betsize*targetmultiplier)-betsize).toFixed(2)}</div>
+				{/if}</div></div>
+		<div class="div10"><div><span class="balance">$ {balance.toFixed(2)}</span></div></div>
+			<div class="div11"><div>{#if win_state_animation_lose == true }<div class="balance_lose" transition:blur="{{duration:350, easing: cubicOut,amount: 5,delay:0}}"
+			on:introend="{() => {win_state_animation_lose = false}}">-{betsize.toFixed(2)}</div>{/if}</div></div>
+			</div>
+				
+				
+				
 </div>
+
+
+
+
+
+
+		
+		<div class="div2">
+
+			
+
+	 
+				
+					
+					
+					   
+					 
+					<div><input type="number" bind:value={betsize} style:width="100px"><p2>on win: {(win_amount-betsize).toFixed(2)}  </p2><br><p2><input type="number" disabled bind:value={bet_totalamount} style:width="50px">autobet</p2></div>
+					<button id="rollbutton" on:click="{roll}" on:click="{() => progress.set(parseFloat(ergebnis_single))}">ROLL</button>
+				  
+			
+
+		</div>
+
+		
+		<div class="div3">
+
+			<div> 
+				{#if win_state == true } <div class="cell" class:selected="{win_state}" in:fly="{{delay: 0, duration: 250, x: 0, y: -500, opacity: 1, easing: cubicOut}}">WIN!</div>
+				{:else} <div class="cell" class:selected="{win_state}" in:fly="{{delay: 0, duration: 300, x: 0, y: 250, opacity: 1, easing: cubicOut}}">LOSE!</div> {/if} </div>
+				<div>
+			<span class="cell" class:selected="{win_state}">{$progress.toFixed(2)}</span>
+			<div>
+			  <label for="range">
+			  <input type="range" id="range_result" step="0.05" disabled min="0.00" max="100.00" value="{$progress}" name="range">
+			</label>
+		</div>
+		<label for="range">
+			<input type="range" min="2.00" max="99.00" list="ticks" bind:value={targetnumber} id="rangepicker" name="rangepicker" style:margin-bottom="1px">
+		  </label>
+		  
+		  <datalist id="ticks">
+	<option value="0">0</option>
+	<option value="25">25</option>
+	<option value="50">50</option>
+	<option value="75">75</option>
+	<option value="100">100</option>
+		  </datalist>
+		  <p3 id="ergebnis_float" style:text-align="center" style:margin-top="1px">>{targetnumber} </p3> </div>
+			
+		 <div class="parent2">
+		  <div class="div7">
+			<p2>Chance</p2><br>
+			{100-targetnumber}% </div>
+			<div class="div8"><p2>Multiplier</p2><br> {targetmultiplier}x </div>
+		
+
+		
+
+
+		</div></div>
+		<div class="div4">
+
+	
+	
+			
+				
+				
+				
+					<canvas id="myChart"></canvas>
+				
+				 
+			  
+			  
+
+			
+
+		</div>
+		<div class="div5">
+
+
+			{#if menu === 1}
+<Dice />
+{:else if menu === 2}
+<Limbo /> {/if}
+
+		</div>
+		
+
+
+
+		
+	
 			
 			
 			
@@ -272,73 +330,24 @@ function addData() {
 		
 		
 		
-		</header>
-		<div> 
-		{#if win_state == true } <div class="cell" class:selected="{win_state}" in:fly="{{delay: 0, duration: 250, x: 0, y: -500, opacity: 1, easing: cubicOut}}">WIN!</div>
-		{:else} <div class="cell" class:selected="{win_state}" in:fly="{{delay: 0, duration: 300, x: 0, y: 250, opacity: 1, easing: cubicOut}}">LOSE!</div> {/if} </div>
-		<div>
-	<span class="cell" class:selected="{win_state}">{$progress.toFixed(2)}
-		<!-- <p2 id="ergebnis_floatp" style:text-align="center">{$progress.toFixed(2)}</p2> -->
-	</span></div>
-	<div>
-	  <label for="range">
-	  <input type="range" id="range_result" step="0.05" disabled min="0.00" max="100.00" value="{$progress}" name="range">
-	</label>
-</div>
+		
+		
 	
 	
 	
 	 
-	<div id="targetnumber">
+	
 
-	 
-	<details id="settings">
-		<!-- svelte-ignore a11y-no-redundant-roles -->
-		<summary class="secondary" style:text-align="left" style:font-size="26px">SETTINGS</summary>
-		
-		
-		   <div class="parent">
-		<div class="div1"> <label for="range">
-		<input type="range" min="2.00" max="99.00" list="ticks" bind:value={targetnumber} id="rangepicker" name="rangepicker" style:margin-bottom="1px">
-	  </label>
+	
 	  
-	  <datalist id="ticks">
-<option value="0">0</option>
-<option value="25">25</option>
-<option value="50">50</option>
-<option value="75">75</option>
-<option value="100">100</option>
-	  </datalist>
-	  <p3 id="ergebnis_float" style:text-align="center" style:margin-top="1px">>{targetnumber} </p3> </div>
-		<div class="div2">{100-targetnumber}% </div>
-		<div class="div3"> {targetmultiplier}x </div>
-		</div>
-	  </details>
-
-	
-	  <footer>
-		<div><input type="number" bind:value={betsize} style:width="75px"><p2>on win: {(win_amount-betsize).toFixed(2)}  </p2><input type="number" bind:value={bet_totalamount} style:width="75px">autobet</div>
-
-		<button id="rollbutton" on:click="{roll}" on:click="{() => progress.set(parseFloat(ergebnis_single))}">ROLL</button></footer>
+		
 	
 	
-	</article>
-	<article>
-	
-		<details id="details">
-			<!-- svelte-ignore a11y-no-redundant-roles -->
-			<summary role="button" on:click="{renderChart}">Chart</summary>
-			
-			<div>
-				<canvas id="myChart"></canvas>
-			</div>
-			 
-		  </details>
-		  
-		  
 	
 	
-	</article>
+	
+	
+	
 	  
 	</main>
 	
@@ -349,12 +358,16 @@ function addData() {
 main{
 
 text-align: center;
-margin-top: -82px;
+
 
 }
 
 
-#range_result{}
+body {
+
+	min-height: 100%;
+
+}
 
 
 
@@ -369,7 +382,7 @@ font-size: large;
 
 #targetnumber {
 
-	margin-top: 24px;
+	margin-top: 8px;
 }
 
 #ergebnis_floatp {
@@ -424,16 +437,16 @@ font-weight: lighter ;
 
 }
 
-span.balance_win {
-	position: absolute;
+div.balance_win {
+	
 font-size: 22px;
 font-weight: lighter ;
 color:#33ff05;
 
 }
 
-span.balance_lose {
-	position: absolute;
+div.balance_lose {
+	
 font-size: 22px;
 font-weight: lighter ;
 color:#ff2f05;
@@ -468,24 +481,149 @@ div.cell.selected {
 
 .parent {
 display: grid;
-grid-template-columns: repeat(2, 1fr);
-grid-template-rows: repeat(2, 1fr);
-grid-column-gap: 5px;
-grid-row-gap: 5px;
+grid-template-columns: 1fr repeat(2, 2fr);
+grid-template-rows: 0.8fr 2fr repeat(2, 0.3fr);
+grid-column-gap: 15px;
+grid-row-gap: 15px;
+
 }
 
-.div1 { grid-area: 1 / 1 / 2 / 3; }
-.div2 { grid-area: 2 / 1 / 3 / 2; }
-.div3 { grid-area: 2 / 2 / 3 / 3; }
+.div1 { grid-area: 1 / 1 / 2 / 4; 
+	box-shadow:
+  0 2.8px 2.2px rgba(0, 0, 0, 0.034),
+  0 6.7px 5.3px rgba(0, 0, 0, 0.048),
+  0 12.5px 10px rgba(0, 0, 0, 0.06),
+  0 22.3px 17.9px rgba(0, 0, 0, 0.072),
+  0 41.8px 33.4px rgba(0, 0, 0, 0.086),
+  0 100px 80px rgba(0, 0, 0, 0.12);
+  background-color: #151d25;
+  border-radius: 8px;
+  padding: 2px;
+
+
+
+}
+
+
+
+.div2 { grid-area: 2 / 1 / 3 / 2; 
+
+	box-shadow:
+  0 2.8px 2.2px rgba(0, 0, 0, 0.034),
+  0 6.7px 5.3px rgba(0, 0, 0, 0.048),
+  0 12.5px 10px rgba(0, 0, 0, 0.06),
+  0 22.3px 17.9px rgba(0, 0, 0, 0.072),
+  0 41.8px 33.4px rgba(0, 0, 0, 0.086),
+  0 100px 80px rgba(0, 0, 0, 0.12);
+  background-color: #151d25;
+  border-radius: 8px;
+padding: 1rem;
+
+
+}
+
+.div3 { grid-area: 2 / 2 / 3 / 3; 
+
+	box-shadow:
+  0 2.8px 2.2px rgba(0, 0, 0, 0.034),
+  0 6.7px 5.3px rgba(0, 0, 0, 0.048),
+  0 12.5px 10px rgba(0, 0, 0, 0.06),
+  0 22.3px 17.9px rgba(0, 0, 0, 0.072),
+  0 41.8px 33.4px rgba(0, 0, 0, 0.086),
+  0 100px 80px rgba(0, 0, 0, 0.12);
+  background-color: #151d25;
+  border-radius: 8px;
+  padding: 1rem;
+
+
+}
+
+.div4 { grid-area: 2 / 3 / 3 / 4; 
+
+	box-shadow:
+  0 2.8px 2.2px rgba(0, 0, 0, 0.034),
+  0 6.7px 5.3px rgba(0, 0, 0, 0.048),
+  0 12.5px 10px rgba(0, 0, 0, 0.06),
+  0 22.3px 17.9px rgba(0, 0, 0, 0.072),
+  0 41.8px 33.4px rgba(0, 0, 0, 0.086),
+  0 100px 80px rgba(0, 0, 0, 0.12);
+  background-color: #151d25;
+  border-radius: 8px;
+  padding: 1rem;
+
+
+}
+
+.div5 { grid-area: 3 / 1 / 4 / 4;
+
+	box-shadow:
+  0 2.8px 2.2px rgba(0, 0, 0, 0.034),
+  0 6.7px 5.3px rgba(0, 0, 0, 0.048),
+  0 12.5px 10px rgba(0, 0, 0, 0.06),
+  0 22.3px 17.9px rgba(0, 0, 0, 0.072),
+  0 41.8px 33.4px rgba(0, 0, 0, 0.086),
+  0 100px 80px rgba(0, 0, 0, 0.12);
+  background-color: #151d25;
+  border-radius: 8px;
+  padding: 1rem;
+
+
+}
+
+
+
+.div6 { grid-area: 4 / 1 / 5 / 4;
+
+	box-shadow:
+  0 2.8px 2.2px rgba(0, 0, 0, 0.034),
+  0 6.7px 5.3px rgba(0, 0, 0, 0.048),
+  0 12.5px 10px rgba(0, 0, 0, 0.06),
+  0 22.3px 17.9px rgba(0, 0, 0, 0.072),
+  0 41.8px 33.4px rgba(0, 0, 0, 0.086),
+  0 100px 80px rgba(0, 0, 0, 0.12);
+  background-color: #151d25;
+  border-radius: 8px;
+  padding: 1rem;
+
+
+}
 
 .parent2 {
 display: grid;
-grid-template-columns: (1fr, 0.25fr, 1fr);
-grid-template-rows: 0.5fr;
+grid-template-columns: repeat(2, 1fr);
+grid-template-rows: 1fr;
 grid-column-gap: 0px;
 grid-row-gap: 0px;
 }
-.div4 { grid-area: 1 / 1 / 2 / 2;text-align: right; }
-.div5 { grid-area: 1 / 2 / 2 / 3;text-align: center; }
-.div6 { grid-area: 1 / 3 / 2 / 4;text-align: left; }
-	</style>
+
+.div7 { grid-area: 1 / 1 / 2 / 2; }
+.div8 { grid-area: 1 / 2 / 2 / 3; }
+.container {
+    max-width: none;
+	padding: 2rem;
+}
+
+
+.parent3 {
+display: grid;
+grid-template-columns: 1fr;
+grid-template-rows: 0.5fr 1fr 0.5fr;
+grid-column-gap: 4px;
+grid-row-gap: 4px;
+}
+
+.div9 { grid-area: 1 / 1 / 2 / 2;
+position:absolute;
+left: 48%;
+height: 8px;
+
+}
+.div10 { grid-area: 2 / 1 / 3 / 2;
+margin: 3px; }
+.div11 { grid-area: 3 / 1 / 4 / 2; 
+
+
+	position:relative;
+
+height: 8px;}
+</style>
