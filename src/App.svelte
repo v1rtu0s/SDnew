@@ -23,10 +23,12 @@ import { getRelativePosition } from 'chart.js/helpers';
 	var win_state_animation = false;
 	var win_state_animation_lose = false;
 	var balance = 100.00;
+	var balance_start = 100.00;
 	var betsize = 0;
 	var win_amount = 0;
 	var balance_array = [];
 	var nonce_array = [];
+	var bet_totalamount = 1;
 	var chart = undefined;
 	var xxx = document.getElementById("ergebnis_floatp");
 	var details_var = undefined;
@@ -49,45 +51,82 @@ import { getRelativePosition } from 'chart.js/helpers';
 			duration: 200,
 			easing: cubicOut});
 	
-	
-	
-	function roll() {
+	function autoroll() {for (var i = bet_totalamount; i > 0; i--) { 
+		
 		balance = balance-betsize;
 		balance_progress.set(balance);
+		nonce++;
+		nonce_array.push(nonce);
+		result = (Math.random()*100).toFixed(2);
+		resultarray.push(result);
+		console.log(resultarray);
+		console.log(nonce);
+		ergebnis_float = resultarray[resultarray.length-1];
+		ergebnis_single = ergebnis_float;
+		console.log(ergebnis_single);
+		bet_totalamount--;
+	
+		evaluate_roll();}}
+	
+	function roll() {
+		
+		  
+		
+	balance = balance-betsize;
+	balance_progress.set(balance);
 	nonce++;
 	nonce_array.push(nonce);
 	result = (Math.random()*100).toFixed(2);
-	
 	resultarray.push(result);
 	console.log(resultarray);
 	console.log(nonce);
-
 	ergebnis_float = resultarray[resultarray.length-1];
 	ergebnis_single = ergebnis_float;
 	console.log(ergebnis_single);
 	
-if (ergebnis_single >= targetnumber) {
 
-    balance = balance + (betsize*targetmultiplier);
-	balance_progress.set(balance);
-	balance_array.push(balance);
-	win_state = true;
-	win_state_animation = true;
-	color_change_win();
+	evaluate_roll();
+
+	
+
+	}
+
+function evaluate_roll() {
+	
+	if (ergebnis_single >= targetnumber) {
+
+balance = balance + (betsize*targetmultiplier);
+balance_progress.set(balance);
+balance_array.push(balance);
+win_state = true;
+win_state_animation = true;
+color_change_win();
 addData();
 
 }
 
 else {
-	balance_array.push(balance);
-	win_state_animation_lose = true;
-	win_state = false;
-	color_change_lose();
-	addData();
-}
+balance_array.push(balance);
+win_state_animation_lose = true;
+win_state = false;
+color_change_lose();
+addData();
+}}
+
+
+	//return {ergebnis_float, ergebnis_single, resultarray, win_state, bet_totalamount}
+
+
+	           
 	
 	
-	return {ergebnis_float, ergebnis_single, resultarray, win_state}}
+	
+
+
+
+
+
+
 	
 	
 //$: ergebnis_single, color_change(); 
@@ -159,14 +198,43 @@ duration: 150,
 function addData() {
 	chart.data.datasets.data = balance_array;
 	chart.data.labels = nonce_array;
-	if (balance > balance_array[0]) {
+	
+	
+	
+	if (balance >= balance_start) {
+
+
+		if (balance <= balance_start*1.5) {
+
+        chart.data.datasets[0].backgroundColor="#058c00";
+		chart.data.datasets[0].borderColor="#058c00";
+
+		}
 		
+		else { 
 		chart.data.datasets[0].backgroundColor="#33ff05";
-		chart.data.datasets[0].borderColor="#33ff05";
+		chart.data.datasets[0].borderColor="#33ff05";}
+
+
+
+
 	}
 
-	else {chart.data.datasets[0].backgroundColor="#ff4000";
-		chart.data.datasets[0].borderColor="#ff4000";}
+	else {
+		
+		if (balance > balance_start*0.5) {
+			chart.data.datasets[0].backgroundColor="#ff4000";
+		    chart.data.datasets[0].borderColor="#ff4000";}
+	else {
+		chart.data.datasets[0].backgroundColor="#9e0000";
+		    chart.data.datasets[0].borderColor="#9e0000";
+		
+	}
+	
+	}
+		
+		
+		
 	
 	chart.update()
 	};
@@ -249,7 +317,7 @@ function addData() {
 
 	
 	  <footer>
-		<input type="number" bind:value={betsize} style:width="75px"><p2>on win: {(win_amount-betsize).toFixed(2)}</p2>
+		<div><input type="number" bind:value={betsize} style:width="75px"><p2>on win: {(win_amount-betsize).toFixed(2)}  </p2><input type="number" bind:value={bet_totalamount} style:width="75px">autobet</div>
 
 		<button id="rollbutton" on:click="{roll}" on:click="{() => progress.set(parseFloat(ergebnis_single))}">ROLL</button></footer>
 	
