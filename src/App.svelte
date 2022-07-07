@@ -5,6 +5,10 @@
 		import { fly } from 'svelte/transition';
 	import { quintOut } from 'svelte/easing';
 	import  { blur } from 'svelte/transition';
+	import Chart from 'chart.js/auto';
+import { getRelativePosition } from 'chart.js/helpers';
+
+
 	
 	
 	var result = 0;
@@ -21,12 +25,18 @@
 	var balance = 100.00;
 	var betsize = 0;
 	var win_amount = 0;
+	var balance_array = [];
+	var nonce_array = [];
+	var chart = undefined;
 	var xxx = document.getElementById("ergebnis_floatp");
+	var details_var = undefined;
 	
 	$: targetmultiplier = (100/(100-targetnumber)).toFixed(2);
 	$: resultarray = resultarray;
 	$: win_amount = (betsize*targetmultiplier).toFixed(2);
 	$: balance = balance;
+	//$: balance_array.push(balance), console.log(balance_array);
+	//$: nonce_array.push(nonce), console.log(nonce_array);
 	
 
 	const progress = tweened(0, {
@@ -45,6 +55,7 @@
 		balance = balance-betsize;
 		balance_progress.set(balance);
 	nonce++;
+	nonce_array.push(nonce);
 	result = (Math.random()*100).toFixed(2);
 	
 	resultarray.push(result);
@@ -59,18 +70,20 @@ if (ergebnis_single >= targetnumber) {
 
     balance = balance + (betsize*targetmultiplier);
 	balance_progress.set(balance);
+	balance_array.push(balance);
 	win_state = true;
 	win_state_animation = true;
 	color_change_win();
-
+addData();
 
 }
 
 else {
-	
+	balance_array.push(balance);
 	win_state_animation_lose = true;
 	win_state = false;
 	color_change_lose();
+	addData();
 }
 	
 	
@@ -112,9 +125,53 @@ function color_change_lose() {
 
 }	
 
+function renderChart() {
+var ctx = document.getElementById("myChart").getContext("2d");
+  chart = new Chart(ctx, {
+      type: "line",
+      data: {
+        labels: nonce_array,
+        datasets: [
+          {
+            label: "Balance",
+            backgroundColor: "rgb(255, 99, 132)",
+            borderColor: "rgb(255, 99, 132)",
+            data: balance_array
+          }
+        ]
+      },
+      options: {
+		animations: {
+x: {duration: 650},
+y: {duration: 0},
+easing: 'easeOutCubic',
+		},
+		transitions: {
+easing: 'easeOutCubic',
+duration: 150,
+
+		}
+		
+    }})}
+  
 
 
+function addData() {
+	chart.data.datasets.data = balance_array;
+	chart.data.labels = nonce_array;
+	if (balance > balance_array[0]) {
+		
+		chart.data.datasets[0].backgroundColor="#33ff05";
+		chart.data.datasets[0].borderColor="#33ff05";
+	}
+
+	else {chart.data.datasets[0].backgroundColor="#ff4000";
+		chart.data.datasets[0].borderColor="#ff4000";}
 	
+	chart.update()
+	};
+
+
 	
 	
 	
@@ -157,7 +214,7 @@ function color_change_lose() {
 	</span></div>
 	<div>
 	  <label for="range">
-	  <input type="range" step="0.05" disabled min="0.00" max="100.00" value="{$progress}" id="range" name="range">
+	  <input type="range" id="range_result" step="0.05" disabled min="0.00" max="100.00" value="{$progress}" name="range">
 	</label>
 </div>
 	
@@ -165,20 +222,34 @@ function color_change_lose() {
 	
 	 
 	<div id="targetnumber">
-<p>_________________________________</p>
-	<p>SETTINGS</p>
+
 	 
-	  
-	  <div class="parent">
+	<details id="settings">
+		<!-- svelte-ignore a11y-no-redundant-roles -->
+		<summary class="secondary" style:text-align="left" style:font-size="26px">SETTINGS</summary>
+		
+		
+		   <div class="parent">
 		<div class="div1"> <label for="range">
-		<input type="range" min="2.00" max="99.00" bind:value={targetnumber} id="rangepicker" name="rangepicker" style:margin-bottom="1px">
+		<input type="range" min="2.00" max="99.00" list="ticks" bind:value={targetnumber} id="rangepicker" name="rangepicker" style:margin-bottom="1px">
 	  </label>
+	  
+	  <datalist id="ticks">
+<option value="0">0</option>
+<option value="25">25</option>
+<option value="50">50</option>
+<option value="75">75</option>
+<option value="100">100</option>
+	  </datalist>
 	  <p3 id="ergebnis_float" style:text-align="center" style:margin-top="1px">>{targetnumber} </p3> </div>
 		<div class="div2">{100-targetnumber}% </div>
 		<div class="div3"> {targetmultiplier}x </div>
 		</div>
+	  </details>
+
+	
 	  <footer>
-		<input type="number" bind:value={betsize} style:width="350px"><p2>on win: {(win_amount-betsize).toFixed(2)}</p2>
+		<input type="number" bind:value={betsize} style:width="75px"><p2>on win: {(win_amount-betsize).toFixed(2)}</p2>
 
 		<button id="rollbutton" on:click="{roll}" on:click="{() => progress.set(parseFloat(ergebnis_single))}">ROLL</button></footer>
 	
@@ -186,7 +257,17 @@ function color_change_lose() {
 	</article>
 	<article>
 	
-
+		<details id="details">
+			<!-- svelte-ignore a11y-no-redundant-roles -->
+			<summary role="button" on:click="{renderChart}">Chart</summary>
+			
+			<div>
+				<canvas id="myChart"></canvas>
+			</div>
+			 
+		  </details>
+		  
+		  
 	
 	
 	</article>
@@ -197,11 +278,18 @@ function color_change_lose() {
 	
 
 
-body{
+main{
 
 text-align: center;
+margin-top: -82px;
 
 }
+
+
+#range_result{}
+
+
+
 
 div{
 
