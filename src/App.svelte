@@ -376,6 +376,7 @@ main{
 text-align: center;
 
 
+
 }
 
 
@@ -491,7 +492,7 @@ div.cell.selected {
 
 .parent {
 display: grid;
-grid-template-columns: 1fr repeat(2, 2fr);
+grid-template-columns: 1.5fr repeat(2, 2.5fr);
 grid-template-rows: 75px 400px repeat(2, 75px);
 grid-column-gap: 15px;
 grid-row-gap: 15px;
@@ -636,6 +637,12 @@ box-shadow: rgba(0, 0, 0, 0.16) 0px 10px 36px 0px, rgba(0, 0, 0, 0.06) 0px 0px 0
 position:relative;
 margin-left: 50%;
 height:18px;
+
+}
+
+.container {
+
+
 
 }
 
