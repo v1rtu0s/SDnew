@@ -8,7 +8,12 @@
 	import Chart from 'chart.js/auto';
 import { getRelativePosition } from 'chart.js/helpers';
 import Limbo from './Limbo.svelte';
+// import {limbo_roll} from './Limbo.svelte';
 import Dice from './Dice.svelte';
+import Mines from './Mines.svelte';
+import {writable} from 'svelte/store';
+import {setContext} from 'svelte';
+
 
 
 	
@@ -26,11 +31,11 @@ import Dice from './Dice.svelte';
 	var win_state_animation_lose = false;
 	var balance = 100.00;
 	var balance_start = 100.00;
-	var betsize = 0;
+	//var $betsize = 0;
 	var win_amount = 0;
 	var balance_array = [];
 	var nonce_array = [];
-	var bet_totalamount = 1;
+	var bet_totalamount = 0;
 	export let menu = 1;
 	var chart = undefined;
 	var render_chart_value = false;
@@ -39,11 +44,15 @@ import Dice from './Dice.svelte';
 	
 	$: targetmultiplier = (100/(100-targetnumber)).toFixed(2);
 	$: resultarray = resultarray;
-	$: win_amount = (betsize*targetmultiplier).toFixed(2);
+	$: win_amount = ($betsize*targetmultiplier).toFixed(2);
 	$: balance = balance;
+	$: bet_totalamount = bet_totalamount;
 	//$: balance_array.push(balance), console.log(balance_array);
 	//$: nonce_array.push(nonce), console.log(nonce_array);
-	
+
+	let betsize = writable(0);
+	setContext(0,betsize);
+	$betsize = 0;
 
 	const progress = tweened(0, {
 			duration: 300,
@@ -55,33 +64,25 @@ import Dice from './Dice.svelte';
 			duration: 200,
 			easing: cubicOut});
 	
-	function autoroll() {for (var i = bet_totalamount; i > 0; i--) { 
-		
-		balance = balance-betsize;
-		balance_progress.set(balance);
-		nonce++;
-		nonce_array.push(nonce);
-		result = (Math.random()*100).toFixed(2);
-		resultarray.push(result);
-		console.log(resultarray);
-		console.log(nonce);
-		ergebnis_float = resultarray[resultarray.length-1];
-		ergebnis_single = ergebnis_float;
-		console.log(ergebnis_single);
-		bet_totalamount--;
-	
-		evaluate_roll();}}
+function autoroll() {for (var i = 0; i < bet_totalamount; i++) {
+
+
+  roll();
+
+}}
+
 	
 	function roll() {
 		
 		if (render_chart_value == false) { render_chart_value = true; renderChart();}
-		
-	balance = balance-betsize;
+	if (bet_totalamount > 0) {autoroll()} else {	
+	balance = balance-$betsize;
 	balance_progress.set(balance);
 	nonce++;
 	nonce_array.push(nonce);
 	result = (Math.random()*100).toFixed(2);
 	resultarray.push(result);
+	resultarray = resultarray;
 	console.log(resultarray);
 	console.log(nonce);
 	ergebnis_float = resultarray[resultarray.length-1];
@@ -92,14 +93,14 @@ import Dice from './Dice.svelte';
 	evaluate_roll();
 
 	
-
+	}
 	}
 
 function evaluate_roll() {
 	
 	if (ergebnis_single >= targetnumber) {
 
-balance = balance + (betsize*targetmultiplier);
+balance = balance + ($betsize*targetmultiplier);
 balance_progress.set(balance);
 balance_array.push(balance);
 win_state = true;
@@ -206,24 +207,33 @@ function addData() {
 	<main class="container">
 
 
-		<ul id="menu">
+		<ul id="menu" style:text-align="left">
 			<li><a href="/" on:click|preventDefault={() => (menu = 1)}>Dice</a></li> |
-			<li><a href="/" on:click|preventDefault={() => (menu = 2)}>Limbo</a></li>
+			<li><a href="/" on:click|preventDefault={() => (menu = 2)}>Limbo</a></li> |
+			<li><a href="/" on:click|preventDefault={() => (menu = 3)}>Mines</a></li>
 		</ul>
 	<div class="parent">
 		<div class="div1">
-<div class="parent3">
-	
- <div class="div9"><div>{#if win_state_animation == true }<div class="balance_win" transition:blur="{{duration:350, easing: cubicOut,amount: 5,delay:0}}"
-			on:introend="{() => {win_state_animation = false}}"
-				
-				>+{((betsize*targetmultiplier)-betsize).toFixed(2)}</div>
-				{/if}</div></div>
-		<div class="div10"><div><span class="balance">$ {balance.toFixed(2)}</span></div></div>
-			<div class="div11"><div>{#if win_state_animation_lose == true }<div class="balance_lose" transition:blur="{{duration:350, easing: cubicOut,amount: 5,delay:0}}"
-			on:introend="{() => {win_state_animation_lose = false}}">-{betsize.toFixed(2)}</div>{/if}</div></div>
-			</div>
-				
+			
+			
+	<div class="container_balance">
+ {#if win_state_animation == true }
+           <div class="balance_div_win" in:fly="{{delay: 0, duration: 5, x: 0, y: 0, opacity: 0.2, easing: cubicOut}}" 
+		                            out:fly="{{delay: 0, duration: 1100, x: 0, y: -50, opacity: 0.05, easing: cubicOut}}"
+			                        on:introend="{() => {win_state_animation = false}}">
+			             +{(($betsize*targetmultiplier)-$betsize).toFixed(2)}</div>
+ {/if}
+
+		   <div class="balance_div_mitte">$ {balance.toFixed(2)}</div>
+ {#if win_state_animation_lose == true }
+           <div class="balance_div_lose" in:fly="{{delay: 0, duration: 5, x: 0, y: 0, opacity: 0.2, easing: cubicOut}}"
+		                             out:fly="{{delay: 0, duration: 1100, x: 0, y: 50, opacity: 0.05, easing: cubicOut}}"
+			                         on:introend="{() => {win_state_animation_lose = false}}">
+						-{$betsize.toFixed(2)}</div>
+ {/if}
+           <div class="div_links"></div>
+           <div class="div_rechts"></div>	
+	</div>
 				
 				
 </div>
@@ -244,10 +254,10 @@ function addData() {
 					
 					   
 					 
-					<div><input type="number" bind:value={betsize} style:width="100px"><p2>on win: {(win_amount-betsize).toFixed(2)}  </p2><br><p2><input type="number" disabled bind:value={bet_totalamount} style:width="50px">autobet</p2></div>
-					<button id="rollbutton" on:click="{roll}" on:click="{() => progress.set(parseFloat(ergebnis_single))}">ROLL</button>
-				  
-			
+					<div class="divleft"><input type="number" bind:value={$betsize} style:width="100px" style:align="left"><p2>on win: {(win_amount-$betsize).toFixed(2)}  </p2><br><input type="number" style:align="left" bind:value={bet_totalamount} style:width="100px"><p2>autobet</p2></div>
+					 <!-- {#if bet_totalamount > 0 }<div><button id="autorollbutton" on:click="{autoroll}" on:click="{() => progress.set(parseFloat(ergebnis_single))}">AUTOROLL</button></div> -->
+					 <!-- {:else if bet_totalamount == 0 }<div><button id="rollbutton" on:click="{roll}" on:click="{() => progress.set(parseFloat(ergebnis_single))}">ROLL</button></div>{/if} -->
+					 <button id="rollbutton" on:click="{roll}" on:click="{() => progress.set(parseFloat(ergebnis_single))}">ROLL</button>
 
 		</div>
 
@@ -255,14 +265,19 @@ function addData() {
 		<div class="div3">
 
 			<div> 
-				{#if win_state == true } <div class="cell" class:selected="{win_state}" in:fly="{{delay: 0, duration: 250, x: 0, y: -500, opacity: 1, easing: cubicOut}}">WIN!</div>
-				{:else} <div class="cell" class:selected="{win_state}" in:fly="{{delay: 0, duration: 300, x: 0, y: 250, opacity: 1, easing: cubicOut}}">LOSE!</div> {/if} </div>
-				<div>
+				{#if win_state == true } <div class="cell" class:selected="{win_state}" in:blur="{{delay: 0, duration: 500, x: 0, y: 0, opacity: 0.1, easing: cubicOut}}">WIN!</div>
+				{:else} <div class="cell" class:selected="{win_state}" in:blur="{{delay: 0, duration: 500, x: 0, y: 0, opacity: 0.1, easing: cubicOut}}">LOSE!</div> {/if} </div>
+				
+				
+                
+<!--RESULT BIG  -->
+<div><div style:text-align="right">{#if resultarray[nonce-4] != undefined}<span class="divright" style:opacity="25%"> {resultarray[nonce-4]}</span>  <span class="divright" style:opacity="50%"> {resultarray[nonce-3]}</span>  <span class="divright" style:opacity="75%">  {resultarray[nonce-2]}</span>  <span class="divright" style:opacity="100%"> {resultarray[nonce-1]}</span>{/if}</div>
 			<span class="cell" class:selected="{win_state}">{$progress.toFixed(2)}</span>
 			<div>
-			  <label for="range">
+			  <!-- <label for="range">
 			  <input type="range" id="range_result" step="0.05" disabled min="0.00" max="100.00" value="{$progress}" name="range">
-			</label>
+			</label> -->
+			<progress id="progressbar" min="0.00" max="100.00" value="{$progress}" style:height="10px">{progress}</progress>
 		</div>
 		<label for="range">
 			<input type="range" min="2.00" max="99.00" list="ticks" bind:value={targetnumber} id="rangepicker" name="rangepicker" style:margin-bottom="1px">
@@ -288,36 +303,37 @@ function addData() {
 
 
 		</div></div>
+
+		
+
 		<div class="div4">
 
-	
-	
-			
-				
-				
-				
-					<canvas id="myChart"></canvas>
-				
-				 
-			  
-			  
+	{#if menu === 1}
+		<Dice />
+		{:else if menu === 2}
+		<Limbo /> 
+		{:else if menu === 3}
+		<Mines />
+		
+		
+		
+		{/if}
 
 			
+				
+		        
 
 		</div>
-		<div class="div5">
+		<div class="div5" style:height="fit-content">
+			
+<div>
+	<canvas id="myChart"></canvas>
 
-
-			{#if menu === 1}
-<Dice />
-{:else if menu === 2}
-<Limbo /> {/if}
+</div>
+			
 
 		</div>
 		
-
-
-
 		
 	
 			
@@ -369,6 +385,12 @@ body {
 
 }
 
+@media only screen and (prefers-color-scheme: dark) {
+  :root:not([data-theme=light]) {
+
+	--progress-background-color: #24333e !important;
+  --progress-color: rgb(67, 99, 180) !important;
+}  }
 
 
 
@@ -379,6 +401,26 @@ color:#f0f8ff;
 font-size: large;
 
 }	
+.divright {
+text-align: right;
+color: #dbdbdb;
+
+
+}
+.divleft {
+
+	text-align: left;
+}
+
+.display_balance {
+text-align: center;
+width: 250px;
+height: 50px;
+background-color: #151d25;
+
+
+}
+
 
 #targetnumber {
 
@@ -429,38 +471,6 @@ color: #ff4000;
 font-size: 44px;
 font-weight: bolder;
 }
-span.balance {
-text-align: left;
-color:#dbdbdb;
-font-size: 32px;
-font-weight: lighter ;
-
-}
-
-div.balance_win {
-	
-font-size: 22px;
-font-weight: lighter ;
-color:#33ff05;
-
-}
-
-div.balance_lose {
-	
-font-size: 22px;
-font-weight: lighter ;
-color:#ff2f05;
-
-}
-span.icon {
-
-	
-	opacity: 0.25;
-	color: black;
-	font-weight: bolder;
-	font-size: 62px;
-	font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
-}
 
 span.cell.selected {
 	text-align: center;
@@ -482,9 +492,10 @@ div.cell.selected {
 .parent {
 display: grid;
 grid-template-columns: 1fr repeat(2, 2fr);
-grid-template-rows: 0.8fr 2fr repeat(2, 0.3fr);
+grid-template-rows: 75px 400px repeat(2, 75px);
 grid-column-gap: 15px;
 grid-row-gap: 15px;
+
 
 }
 
@@ -499,6 +510,7 @@ grid-row-gap: 15px;
   background-color: #151d25;
   border-radius: 8px;
   padding: 2px;
+  text-align: center;
 
 
 
@@ -518,6 +530,8 @@ grid-row-gap: 15px;
   background-color: #151d25;
   border-radius: 8px;
 padding: 1rem;
+text-align: left;
+
 
 
 }
@@ -596,34 +610,71 @@ grid-column-gap: 0px;
 grid-row-gap: 0px;
 }
 
-.div7 { grid-area: 1 / 1 / 2 / 2; }
-.div8 { grid-area: 1 / 2 / 2 / 3; }
-.container {
-    max-width: none;
-	padding: 2rem;
+
+.div9 {
+position:relative;
+
+height:22px;
+text-align: center;
+
+
 }
 
 
-.parent3 {
-display: grid;
-grid-template-columns: 1fr;
-grid-template-rows: 0.5fr 1fr 0.5fr;
-grid-column-gap: 4px;
-grid-row-gap: 4px;
-}
+.div10_background {
+width: 120px;
+height: auto;
+background-color: #0e1418;
+margin-left: 50%;
+border-radius: 6px;
+box-shadow: rgba(0, 0, 0, 0.16) 0px 10px 36px 0px, rgba(0, 0, 0, 0.06) 0px 0px 0px 1px;
 
-.div9 { grid-area: 1 / 1 / 2 / 2;
-position:absolute;
-left: 48%;
-height: 8px;
 
 }
-.div10 { grid-area: 2 / 1 / 3 / 2;
-margin: 3px; }
-.div11 { grid-area: 3 / 1 / 4 / 2; 
+.div11 { 
+	
+position:relative;
+margin-left: 50%;
+height:18px;
+
+}
+
+.container_balance {  display: grid;
+  grid-template-columns: 1fr 0.5fr 1fr;
+  grid-template-rows: 22px 32px 22px;
+  gap: 0px 0px;
+  grid-auto-flow: row;
+  justify-content: center;
+  align-content: center;
+  justify-items: center;
+  align-items: center;
+  grid-template-areas:
+    "div_links balance_div_win div_rechts"
+    "div_links balance_div_mitte div_rechts"
+    "div_links balance_div_lose div_rechts";
+}
+
+.balance_div_mitte { grid-area: balance_div_mitte; }
+
+.div_links { grid-area: div_links; }
+
+.div_rechts { grid-area: div_rechts; }
+
+.balance_div_win { 
+    color:#72fe00;
+	transition:all 0.5s;
+	font-weight: lighter;
 
 
-	position:relative;
+	grid-area: balance_div_win; }
 
-height: 8px;}
+.balance_div_lose { 
+	color:#fc2200;
+	transition:all 0.5s;
+	font-weight: lighter;
+	
+	grid-area: balance_div_lose; }
+
+
+
 </style>
