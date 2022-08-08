@@ -13,6 +13,8 @@ import Dice from './Dice.svelte';
 import Mines from './Mines.svelte';
 import {writable} from 'svelte/store';
 import {setContext} from 'svelte';
+import {getContext} from 'svelte';
+import Slot from './Slot.svelte';
 
 
 
@@ -35,24 +37,31 @@ import {setContext} from 'svelte';
 	var win_amount = 0;
 	var balance_array = [];
 	var nonce_array = [];
-	var bet_totalamount = 0;
+	var autobet_number = 0;
 	export let menu = 1;
 	var chart = undefined;
 	var render_chart_value = false;
 	var xxx = document.getElementById("ergebnis_floatp");
 	var details_var = undefined;
+	var autobet_active = false;
+	var autobetinterval = undefined;
 	
 	$: targetmultiplier = (100/(100-targetnumber)).toFixed(2);
 	$: resultarray = resultarray;
 	$: win_amount = ($betsize*targetmultiplier).toFixed(2);
 	$: balance = balance;
-	$: bet_totalamount = bet_totalamount;
+	$: autobet_number = autobet_number;
 	//$: balance_array.push(balance), console.log(balance_array);
 	//$: nonce_array.push(nonce), console.log(nonce_array);
 
 	let betsize = writable(0);
 	setContext(0,betsize);
 	$betsize = 0;
+
+	let payoutvalue = writable(0);
+	
+	setContext(0,payoutvalue); 
+    
 
 	const progress = tweened(0, {
 			duration: 300,
@@ -64,20 +73,95 @@ import {setContext} from 'svelte';
 			duration: 200,
 			easing: cubicOut});
 	
-function autoroll() {for (var i = 0; i < bet_totalamount; i++) {
+// function autoroll() {
+	
+// 	if (autobet_active == false ) {
+		
+// 		autobetinterval = setInterval(roll(), 5000);
+// 		let testinterval = setInterval(console.log("testen1"), 1000);
 
+// 	    autobet_active = true;
+// 	}
+	
+// 	else if (autobet_active == true) {console.log(autobet_active)}
+// }
 
-  roll();
+	function autobet_roll() {
 
-}}
+  autobetinterval = setInterval(calculating_result, 150) 
+  autobet_active = true;                                 
+        
+
+                            }
+
+function calculating_result() {
+	if (render_chart_value == false) { render_chart_value = true; renderChart();}
+	
+	if (autobet_number>0) {
+
+		let check_balance = new Promise((resolve, reject) => {
+		if (c >= 0) {resolve("success")} else {reject("fail")} })
+	check_balance.then(() => {
+	autobet_number--;	
+	balance = balance-$betsize;
+	nonce++;
+	nonce_array.push(nonce);
+	result = (Math.random()*100).toFixed(2);
+	resultarray.push(result);
+	resultarray = resultarray;
+	ergebnis_float = resultarray[resultarray.length-1];
+	ergebnis_single = ergebnis_float;
+	progress.set(parseFloat(ergebnis_single));
+	
+	evaluate_roll();	
+	}).catch(()=>{
+		
+		console.log("nicht genug cash");
+	    autobet_finished();
+	alert("nicht genug cash!");
+	
+	
+	})
+		
+	
+	
+	
+	
+	}
 
 	
-	function roll() {
+
+	else if (autobet_number == 0) {
+		autobet_finished();
+		alert("autobet finished completely");
+	
+	}
+
+}
+          
+function autobet_finished() {
+
+
+	    clearInterval(autobetinterval);
+		autobet_active = false;
+		console.log("autobet finished");}
 		
+
+$: c = balance-$betsize
+
+function test1() {console.log($payoutvalue)}
+
+	function roll() {
+
 		if (render_chart_value == false) { render_chart_value = true; renderChart();}
-	if (bet_totalamount > 0) {autoroll()} else {	
+	let check_balance = new Promise((resolve, reject) => {
+	//let c = balance-$betsize;
+	console.log(c, balance, $betsize);
+		if (c >= 0) {resolve("success")} else {reject("fail")} })
+	check_balance.then(() => {	
 	balance = balance-$betsize;
-	balance_progress.set(balance);
+
+	
 	nonce++;
 	nonce_array.push(nonce);
 	result = (Math.random()*100).toFixed(2);
@@ -87,14 +171,21 @@ function autoroll() {for (var i = 0; i < bet_totalamount; i++) {
 	console.log(nonce);
 	ergebnis_float = resultarray[resultarray.length-1];
 	ergebnis_single = ergebnis_float;
-	console.log(ergebnis_single);
+	progress.set(parseFloat(ergebnis_single));
 	
-
 	evaluate_roll();
 
+	if (autobet_number>0) {autobet_roll()}}).catch(()=>{console.log("nicht genug cash")});
+
+
+
 	
-	}
-	}
+}
+
+	
+
+
+	
 
 function evaluate_roll() {
 	
@@ -204,14 +295,17 @@ function addData() {
 	
 	</script>
 	
-	<main class="container">
+	<main class="container_own">
 
-
-		<ul id="menu" style:text-align="left">
+     <div class="navbar">
+		<ul id="menu" class="navbar">
 			<li><a href="/" on:click|preventDefault={() => (menu = 1)}>Dice</a></li> |
 			<li><a href="/" on:click|preventDefault={() => (menu = 2)}>Limbo</a></li> |
-			<li><a href="/" on:click|preventDefault={() => (menu = 3)}>Mines</a></li>
+			<li><a href="/" on:click|preventDefault={() => (menu = 3)}>Mines</a></li> |
+			<li><a href="/" on:click|preventDefault={() => (menu = 4)}>Slot</a></li> 
+		
 		</ul>
+	</div>
 	<div class="parent">
 		<div class="div1">
 			
@@ -254,10 +348,11 @@ function addData() {
 					
 					   
 					 
-					<div class="divleft"><input type="number" bind:value={$betsize} style:width="100px" style:align="left"><p2>on win: {(win_amount-$betsize).toFixed(2)}  </p2><br><input type="number" style:align="left" bind:value={bet_totalamount} style:width="100px"><p2>autobet</p2></div>
-					 <!-- {#if bet_totalamount > 0 }<div><button id="autorollbutton" on:click="{autoroll}" on:click="{() => progress.set(parseFloat(ergebnis_single))}">AUTOROLL</button></div> -->
-					 <!-- {:else if bet_totalamount == 0 }<div><button id="rollbutton" on:click="{roll}" on:click="{() => progress.set(parseFloat(ergebnis_single))}">ROLL</button></div>{/if} -->
-					 <button id="rollbutton" on:click="{roll}" on:click="{() => progress.set(parseFloat(ergebnis_single))}">ROLL</button>
+					<div class="divleft"><input type="number" bind:value={$betsize} style:width="100px" style:align="left"><p2>on win: {(win_amount-$betsize).toFixed(2)}  </p2><br><input type="number" style:align="left" bind:value={autobet_number} style:width="100px"><p2>autobet</p2></div>
+					 <!-- {#if autobet_number > 0 }<div><button id="autorollbutton" on:click="{autoroll}" on:click="{() => progress.set(parseFloat(ergebnis_single))}">AUTOROLL</button></div> -->
+					 <!-- {:else if autobet_number == 0 }<div><button id="rollbutton" on:click="{roll}" on:click="{() => progress.set(parseFloat(ergebnis_single))}">ROLL</button></div>{/if} -->
+					 {#if autobet_active == false }<button id="rollbutton" class="button" on:click="{roll}">ROLL</button>
+					 {:else}<button id="stopautobet_button" class="button" on:click="{autobet_finished}">STOP AUTOBET</button>{/if}
 
 		</div>
 
@@ -314,6 +409,8 @@ function addData() {
 		<Limbo /> 
 		{:else if menu === 3}
 		<Mines />
+		{:else if menu === 4}
+		<Slot />
 		
 		
 		
@@ -369,22 +466,34 @@ function addData() {
 	
 	<style>
 	
-
+	* {
+  box-sizing: border-box;
+  
+}
 
 main{
 
 text-align: center;
+}
+
+#stopautobet_button {
+	--primary: #cd4846;
+
+transition:color 0.5s;
+
+}
+
+#stopautobet_button:hover {
+	--primary: #ed6e6c !important;
+	background-color: #ae2220;
+	border-color: #cd4846;
 
 
 
 }
 
 
-body {
 
-	min-height: 100%;
-
-}
 
 @media only screen and (prefers-color-scheme: dark) {
   :root:not([data-theme=light]) {
@@ -393,7 +502,14 @@ body {
   --progress-color: rgb(67, 99, 180) !important;
 }  }
 
+.navbar {
 
+font-size: 18px;
+text-align: left;
+margin-bottom: auto;
+
+
+}
 
 div{
 
@@ -492,10 +608,16 @@ div.cell.selected {
 
 .parent {
 display: grid;
-grid-template-columns: 1.5fr repeat(2, 2.5fr);
+
+grid-template-columns: 0.5fr 1fr 1fr;
 grid-template-rows: 75px 400px repeat(2, 75px);
 grid-column-gap: 15px;
 grid-row-gap: 15px;
+margin: 4px;
+width: calc(100%-8px);
+
+
+
 
 
 }
@@ -640,7 +762,12 @@ height:18px;
 
 }
 
-.container {
+.container_own {
+width: 100%;
+
+
+
+
 
 
 

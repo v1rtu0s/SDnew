@@ -12,12 +12,16 @@
     var passed = new Array(25);
     var mines_payout_multiplier = 0;
     var passed_mutiplier = 0;
+    var helper = 0;
+   
+	
     
     let betsize = getContext(0);  
     
-	boom_state.fill(undefined);
-    
-  
+	boom_state.fill(false);
+
+	
+   let payoutvalue = getContext(0);
 
   function ncr(n,r) { 
 return Math.floor(factorialize(n))/Math.floor(factorialize(r))/Math.floor(factorialize(n-r))};
@@ -33,7 +37,7 @@ return Math.floor(factorialize(n))/Math.floor(factorialize(r))/Math.floor(factor
 }
 
 $: mines_payout_multiplier = ncr(25, passed_mutiplier)/ncr(25-mines_amount, passed_mutiplier);
-	
+
 
 function press() {
 		
@@ -68,8 +72,9 @@ function press() {
 	function start_bet(){
 
         if (active_bet == false)
-         {
-            boom_state.fill(undefined);
+         { 
+            
+            boom_state.fill(false);
 		active_bet = true;
         passed_mutiplier = 0;
         passed = new Array(25);
@@ -87,7 +92,10 @@ function press() {
     }
 		 
 		
-	function pay_out() {console.log({$betsize});}
+	function pay_out() {
+        console.log((mines_payout_multiplier*$betsize).toFixed(2));
+        $payoutvalue = (mines_payout_multiplier*$betsize).toFixed(2);
+    }
 	
 	
 	
@@ -101,31 +109,31 @@ function press() {
 <input type="range" min="1" max="20" bind:value={mines_amount} style:margin-bottom="1px"><p>{mines_amount} mines</p>
 
 <div class="parent">
-<div class="div1"><button class="field"  class:selected={active_bet}  id="1" class:boomboom={boom_state[0]} class:passanimation={passed[1]} on:click="{press}">1</button></div>
-<div class="div2"><button class="field" class:selected={active_bet}   id="2" class:boomboom={boom_state[1]} class:passanimation={passed[2]} on:click="{press}">2</button> </div>
-<div class="div3"><button class="field" class:selected={active_bet}   id="3" class:boomboom={boom_state[2]} class:passanimation={passed[3]} on:click="{press}">3</button> </div>
-<div class="div4"><button class="field" class:selected={active_bet}  id="4"  class:boomboom={boom_state[3]} class:passanimation={passed[4]} on:click="{press}">4</button> </div>
-<div class="div5"><button class="field" class:selected={active_bet}  id="5"  class:boomboom={boom_state[4]} class:passanimation={passed[5]} on:click="{press}">5</button> </div>
-<div class="div6"><button class="field"  class:selected={active_bet} id="6"  class:boomboom={boom_state[5]} class:passanimation={passed[6]} on:click="{press}">6</button> </div>
-<div class="div7"><button class="field"  class:selected={active_bet} id="7"  class:boomboom={boom_state[6]} class:passanimation={passed[7]} on:click="{press}">7</button> </div>
-<div class="div8"><button class="field" class:selected={active_bet}  id="8"  class:boomboom={boom_state[7]} class:passanimation={passed[8]} on:click="{press}">8</button> </div>
-<div class="div9"> <button class="field" class:selected={active_bet}  id="9"  class:boomboom={boom_state[8]} class:passanimation={passed[9]} on:click="{press}">9</button></div>
-<div class="div10"><button class="field" class:selected={active_bet}  id="10"  class:boomboom={boom_state[9]} class:passanimation={passed[10]} on:click="{press}">10</button> </div>
-<div class="div11"><button class="field" class:selected={active_bet}  id="11"  class:boomboom={boom_state[10]} class:passanimation={passed[11]} on:click="{press}">11</button> </div>
-<div class="div12"><button class="field" class:selected={active_bet}  id="12"  class:boomboom={boom_state[11]} class:passanimation={passed[12]} on:click="{press}">12</button> </div>
-<div class="div13"><button class="field" class:selected={active_bet}  id="13"  class:boomboom={boom_state[12]} class:passanimation={passed[13]} on:click="{press}">13</button> </div>
-<div class="div14"><button class="field" class:selected={active_bet}  id="14"  class:boomboom={boom_state[13]} class:passanimation={passed[14]} on:click="{press}">14</button> </div>
-<div class="div15"><button class="field" class:selected={active_bet}  id="15"  class:boomboom={boom_state[14]} class:passanimation={passed[15]} on:click="{press}">15</button> </div>
-<div class="div16"><button class="field" class:selected={active_bet}  id="16"  class:boomboom={boom_state[15]} class:passanimation={passed[16]} on:click="{press}">16</button> </div>
-<div class="div17"><button class="field" class:selected={active_bet}  id="17" class:boomboom={boom_state[16]} class:passanimation={passed[17]} on:click="{press}">17</button> </div>
-<div class="div18"><button class="field" class:selected={active_bet}  id="18" class:boomboom={boom_state[17]} class:passanimation={passed[18]} on:click="{press}">18</button> </div>
-<div class="div19"><button class="field" class:selected={active_bet}  id="19" class:boomboom={boom_state[18]} class:passanimation={passed[19]} on:click="{press}">19</button> </div>
-<div class="div20"><button class="field" class:selected={active_bet}  id="20" class:boomboom={boom_state[19]} class:passanimation={passed[20]} on:click="{press}">20</button> </div>
-<div class="div21"><button class="field" class:selected={active_bet}  id="21" class:boomboom={boom_state[20]} class:passanimation={passed[21]} on:click="{press}">21</button> </div>
-<div class="div22"><button class="field" class:selected={active_bet}  id="22" class:boomboom={boom_state[21]} class:passanimation={passed[22]} on:click="{press}">22</button> </div>
-<div class="div23"><button class="field" class:selected={active_bet}  id="23" class:boomboom={boom_state[22]} class:passanimation={passed[23]} on:click="{press}">23</button> </div>
-<div class="div24"><button class="field" class:selected={active_bet}  id="24" class:boomboom={boom_state[23]} class:passanimation={passed[24]} on:click="{press}">24</button> </div>
-<div class="div25"><button class="field" class:selected={active_bet}  id="25" class:boomboom={boom_state[24]} class:passanimation={passed[25]} on:click="{press}">25</button> </div>
+<div class="div1"><button class="field"  class:selected={active_bet}  id="1" class:boomboom={boom_state[0]} class:passanimation={passed[1]} on:click="{press}"></button></div>
+<div class="div2"><button class="field" class:selected={active_bet}   id="2" class:boomboom={boom_state[1]} class:passanimation={passed[2]} on:click="{press}"></button> </div>
+<div class="div3"><button class="field" class:selected={active_bet}   id="3" class:boomboom={boom_state[2]} class:passanimation={passed[3]} on:click="{press}"></button> </div>
+<div class="div4"><button class="field" class:selected={active_bet}  id="4"  class:boomboom={boom_state[3]} class:passanimation={passed[4]} on:click="{press}"></button> </div>
+<div class="div5"><button class="field" class:selected={active_bet}  id="5"  class:boomboom={boom_state[4]} class:passanimation={passed[5]} on:click="{press}"></button> </div>
+<div class="div6"><button class="field"  class:selected={active_bet} id="6"  class:boomboom={boom_state[5]} class:passanimation={passed[6]} on:click="{press}"></button> </div>
+<div class="div7"><button class="field"  class:selected={active_bet} id="7"  class:boomboom={boom_state[6]} class:passanimation={passed[7]} on:click="{press}"></button> </div>
+<div class="div8"><button class="field" class:selected={active_bet}  id="8"  class:boomboom={boom_state[7]} class:passanimation={passed[8]} on:click="{press}"></button> </div>
+<div class="div9"> <button class="field" class:selected={active_bet}  id="9"  class:boomboom={boom_state[8]} class:passanimation={passed[9]} on:click="{press}"></button></div>
+<div class="div10"><button class="field" class:selected={active_bet}  id="10"  class:boomboom={boom_state[9]} class:passanimation={passed[10]} on:click="{press}"></button> </div>
+<div class="div11"><button class="field" class:selected={active_bet}  id="11"  class:boomboom={boom_state[10]} class:passanimation={passed[11]} on:click="{press}"></button> </div>
+<div class="div12"><button class="field" class:selected={active_bet}  id="12"  class:boomboom={boom_state[11]} class:passanimation={passed[12]} on:click="{press}"></button> </div>
+<div class="div13"><button class="field" class:selected={active_bet}  id="13"  class:boomboom={boom_state[12]} class:passanimation={passed[13]} on:click="{press}"></button> </div>
+<div class="div14"><button class="field" class:selected={active_bet}  id="14"  class:boomboom={boom_state[13]} class:passanimation={passed[14]} on:click="{press}"></button> </div>
+<div class="div15"><button class="field" class:selected={active_bet}  id="15"  class:boomboom={boom_state[14]} class:passanimation={passed[15]} on:click="{press}"></button> </div>
+<div class="div16"><button class="field" class:selected={active_bet}  id="16"  class:boomboom={boom_state[15]} class:passanimation={passed[16]} on:click="{press}"></button> </div>
+<div class="div17"><button class="field" class:selected={active_bet}  id="17" class:boomboom={boom_state[16]} class:passanimation={passed[17]} on:click="{press}"></button> </div>
+<div class="div18"><button class="field" class:selected={active_bet}  id="18" class:boomboom={boom_state[17]} class:passanimation={passed[18]} on:click="{press}"></button> </div>
+<div class="div19"><button class="field" class:selected={active_bet}  id="19" class:boomboom={boom_state[18]} class:passanimation={passed[19]} on:click="{press}"></button> </div>
+<div class="div20"><button class="field" class:selected={active_bet}  id="20" class:boomboom={boom_state[19]} class:passanimation={passed[20]} on:click="{press}"></button> </div>
+<div class="div21"><button class="field" class:selected={active_bet}  id="21" class:boomboom={boom_state[20]} class:passanimation={passed[21]} on:click="{press}"></button> </div>
+<div class="div22"><button class="field" class:selected={active_bet}  id="22" class:boomboom={boom_state[21]} class:passanimation={passed[22]} on:click="{press}"></button> </div>
+<div class="div23"><button class="field" class:selected={active_bet}  id="23" class:boomboom={boom_state[22]} class:passanimation={passed[23]} on:click="{press}"></button> </div>
+<div class="div24"><button class="field" class:selected={active_bet}  id="24" class:boomboom={boom_state[23]} class:passanimation={passed[24]} on:click="{press}"></button> </div>
+<div class="div25"><button class="field" class:selected={active_bet}  id="25" class:boomboom={boom_state[24]} class:passanimation={passed[25]} on:click="{press}"></button> </div>
 </div>
 </main>
 <style>
@@ -140,11 +148,13 @@ margin-top: 1px;
     }
 
 .parent {
+    margin-top: 0fr;
+height: auto; 
 display: grid;
-grid-template-columns: repeat(5, 0.2fr);
-grid-template-rows: repeat(5, 0.2fr);
-grid-column-gap: 3px;
-grid-row-gap: 3px;
+grid-template-columns: repeat(5, 3rem);
+grid-template-rows: repeat(5, 2.2rem);
+grid-column-gap: 1px;
+grid-row-gap: 1px;
 }
 
 .div1 { grid-area: 1 / 1 / 2 / 2; }
@@ -184,6 +194,7 @@ grid-row-gap: 3px;
   border-bottom-left-radius:7px;
   border-bottom-right-radius:7px;
   box-shadow:inset 0px 0px 15px -4px #16233a;
+  font-size: smaller;
     width: 100%;
 	height: 100%;
     transition: all 0.5s;
